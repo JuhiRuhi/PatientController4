@@ -1,0 +1,145 @@
+package com.wb.controller;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wb.model.Admission;
+import com.wb.model.Appointment;
+import com.wb.model.Doctor;
+import com.wb.model.Medicine;
+import com.wb.model.Operation;
+import com.wb.model.PatientLogin;
+import com.wb.model.Prescription;
+import com.wb.service.PatientService;
+
+@RestController
+@RequestMapping("/pApi")
+public class PatientController
+{
+	@Autowired
+	private PatientService pservice;
+	
+	Logger log = LoggerFactory.getLogger(PatientController.class);
+	@GetMapping("/checkPatientApi")
+	public ResponseEntity<String> checkPatientApi()
+	{
+		log.trace("checkPatientApi called");
+		return new  ResponseEntity<String>("Patient Controller is Running",HttpStatus.OK);
+	}
+	
+	@PostMapping("/insertPatientLoginDetails")
+	public ResponseEntity<String> insertPatientLoginDetails(@RequestBody PatientLogin plogin)
+	{
+		log.info("insertPatientLoginDetails called");
+		pservice.insertPatientLoginDetails(plogin);
+		log.info("insertPatientLoginDetails ends");
+		return new ResponseEntity<String>("Patient Login Details Inserted",HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/patientlogin/{uname}/{pwd}")
+	public String parentlogin(@PathVariable String uname,@PathVariable String pwd)
+	{
+		String msg = pservice.patientLogin(uname,pwd);
+		if(msg!=null)
+			return "Logged In Successfully";
+		return "Invalid Credentials";
+		
+	}
+	
+	@PostMapping("/insertAppointment")
+	public ResponseEntity<String> insertAppointment(@RequestBody Appointment appointment)
+	{
+		pservice.save(appointment);
+		return new ResponseEntity<String>("Appointment Inserted",HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/viewAppointmentList")
+	public ResponseEntity<List<Appointment>> viewAppointmentList()
+	{
+		List<Appointment> list = pservice.viewAppointmentList();
+		log.debug("Fetched All Appointment Lists");
+		return new ResponseEntity<List<Appointment>>(list,HttpStatus.CREATED);
+    }
+	
+	@PostMapping("/insertdoctor")
+	public ResponseEntity<String> insertdoctor(@RequestBody Doctor doctor)
+	{
+		pservice.insert(doctor);
+		return new ResponseEntity<String>("Doctor Inserted",HttpStatus.ACCEPTED);
+	}
+
+	@GetMapping("/viewDoctorLists")
+	public ResponseEntity<List<Doctor>> viewDoctorLists()
+	{
+		List<Doctor> doctor = pservice.viewDoctorLists();
+		return new ResponseEntity<List<Doctor>>(doctor,HttpStatus.ACCEPTED);
+	}
+	
+	@PostMapping("/insertPrescriptionDetails")
+	public ResponseEntity<String> insertPrescriptionDetails(@RequestBody Prescription prescriptiondetails)
+	{
+		pservice.insert(prescriptiondetails);
+		return new ResponseEntity<String>("Prescription Details Added",HttpStatus.FOUND);
+	}
+	
+	@GetMapping("/viewPrDetails")
+	public ResponseEntity<List<Prescription>> viewPrDetails()
+	{
+		List<Prescription> l = pservice.viewPrDetails();
+		return new ResponseEntity<List<Prescription>>(l,HttpStatus.FOUND);
+	}
+	
+    @PostMapping("/insertmedicine")
+	public ResponseEntity<String> insertmedicine(@RequestBody Medicine m)
+	{
+		pservice.insertmedicine(m);
+		return new ResponseEntity<String>("Medicines Inserted",HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/viewMedication")
+	public ResponseEntity<List<Medicine>> viewMedication()
+	{
+		List<Medicine> medication = pservice.viewMedication();
+		return new ResponseEntity<List<Medicine>>(medication,HttpStatus.ACCEPTED);
+	}
+	
+	@PostMapping("/insertadmithistory")
+	public ResponseEntity<String> insertadmithistory(@RequestBody Admission admit)
+	{
+		pservice.insertadmithistory(admit);
+		return new  ResponseEntity<String>("Admit History Inserted",HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/viewAdmitHistory")
+	public ResponseEntity<List<Admission>> viewAdmiHistory()
+	{
+		List<Admission> admit = pservice.viewAdmitHistory();
+		return new ResponseEntity<List<Admission>>(admit,HttpStatus.FOUND);
+	}
+	
+	@PostMapping("/insertoperationhistory")
+	public ResponseEntity<String> insertoperationhistory(@RequestBody Operation operation)
+	{
+		pservice.insert(operation);
+		return new ResponseEntity<String>("Operation History Added",HttpStatus.CREATED);
+		
+	}
+	
+	@GetMapping("/viewOperationHistory")
+	public ResponseEntity<List<Operation>> viewOperationHistory()
+	{
+	List<Operation> operation = pservice.viewOperationHistory();
+	return new ResponseEntity<List<Operation>>(operation,HttpStatus.CREATED);
+	}
+}
